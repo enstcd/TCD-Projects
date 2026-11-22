@@ -28,9 +28,9 @@
   // ---------- nav ----------
   function drawNav(route) {
     const on = (k) => (route === k ? 'on' : '');
-    const hubItems = [['#/grade/4', 'Grade 4', 'Term plan, lessons and quizzes', 'LayerGroup'], ['#/grade/5', 'Grade 5', 'Term plan, lessons and quizzes', 'LayerGroup'], ['#/grade/6', 'Grade 6', 'Term plan, lessons and quizzes', 'LayerGroup'], ['#/assessment', 'Term 1 Skills Assessment', 'Mock test, live assessment and certificates', 'Award'], ['#/pool', 'Projects List', 'Every TCD project, with tools, plans and videos', 'Tools'], ['#/games', 'Skills Games', 'Tool Slash, Code the Robot and more', 'Gamepad']];
+    const hubItems = [['#/grade/4', 'Grade 4', 'Term plan, lessons and quizzes', 'LayerGroup'], ['#/grade/5', 'Grade 5', 'Term plan, lessons and quizzes', 'LayerGroup'], ['#/grade/6', 'Grade 6', 'Term plan, lessons and quizzes', 'LayerGroup'], ['#/calendar', 'Academic Calendar', 'Terms, weeks, breaks and assessment dates', 'CalendarAlt'], ['#/framework', 'TCD Framework', 'Learning model, safety, assessment and grade plans', 'BookOpen'], ['#/assessment', 'Term 1 Skills Assessment', 'Mock test, live assessment and certificates', 'Award'], ['#/pool', 'Projects List', 'Every TCD project, with tools, plans and videos', 'Tools'], ['#/games', 'Skills Games', 'Tool Slash, Code the Robot and more', 'Gamepad']];
     if (isInst()) hubItems.push(['#/results', 'Results and Reports', 'Class lists, certificates and report cards', 'ChartBar']);
-    const stuItems = [['#/join', 'Join a Quiz', 'Enter the code on the board', 'Bolt'], ['#/play', 'Play a Game', 'Join a skills game with a code', 'Gamepad'], ['#/games', 'Skills Games', 'Practise games on your own, no login needed', 'PuzzlePiece'], ['#/me', 'My Results', 'Scores, reports and certificates', 'UserGraduate']];
+    const stuItems = [['#/join', 'Join a Quiz', 'Enter the code on the board', 'Bolt'], ['#/play', 'Play a Game', 'Join a skills game with a code', 'Gamepad'], ['#/calendar', 'Academic Calendar', 'Term dates, breaks and assessments', 'CalendarAlt'], ['#/games', 'Skills Games', 'Practise games on your own, no login needed', 'PuzzlePiece'], ['#/me', 'My Results', 'Scores, reports and certificates', 'UserGraduate']];
     const dd = (label, key, items) => `<div class="dd ${on(key)}"><button class="ddb" aria-haspopup="true">${label} ${icon('ChevronDown')}</button><div class="menu">${items.map(([href, n, d, ic]) => `<a href="${href}"><span class="mi">${icon(ic)}</span><span><b>${n}</b><small>${d}</small></span></a>`).join('')}</div></div>`;
     let s = `<a href="#/" class="${on('home')}">Home</a><a href="#/about" class="${on('about')}">About TCC</a>` + dd('TCD Project Hub', 'hub', hubItems) +
       `<a href="#/instructors" class="${on('inst')}">TCD Instructors</a><a href="#/gallery" class="${on('gallery')}">Student Projects Gallery</a><a href="#/initiatives" class="${on('ini')}">Initiatives</a>` + dd('Students', 'stu', stuItems);
@@ -47,16 +47,16 @@
     if (current && current.destroy) current.destroy(); current = null;
     Quiz.clearTimers();
     document.querySelectorAll('.modal').forEach((m) => m.remove());
-    const parts = (location.hash.replace(/^#\/?/, '') || '').split('/');
-    const [p0, p1] = parts;
-    const needStaff = ['grade', 'lesson', 'week', 'project', 'pool', 'results', 'host', 'ghost', 'assessment', 'mock'];
+    const parts = (location.hash.replace(/^#\/?/, '').split('?')[0] || '').split('/');
+    const [p0, p1, p2] = parts;
+    const needStaff = ['grade', 'lesson', 'week', 'project', 'pool', 'results', 'host', 'ghost', 'assessment', 'mock', 'framework', 'plan'];
     if (needStaff.includes(p0) && !isStaff()) { location.hash = '#/login'; return; }
     if ((p0 === 'results' || p0 === 'host') && !isInst()) { app.innerHTML = `<div class="err">This page is for instructors only.</div>`; drawNav(''); return; }
     window.scrollTo(0, 0);
     app.classList.toggle('full', p0 === '');
     const map = {
       '': landing, about: about, gallery: gallery, initiatives: initiatives, games: () => games(p1), play: () => { drawNav('stu'); current = Games.play(app, p1); }, ghost: () => { drawNav('hub'); current = Games.host(app, p1, auth.token); }, login: login, grade: () => grade(p1), lesson: () => lesson(p1, parts[2]), week: () => week(p1, parts[2]),
-      project: () => project(p1), pool: pool, assessment: assessment, mock: () => mock(p1), instructors: instructors, join: () => { drawNav('stu'); Quiz.join(app, p1); }, me: me, results: results, host: () => { drawNav(''); Quiz.host(app, p1, auth.token); },
+      project: () => project(p1), pool: pool, calendar: calendar, framework: framework, plan: () => planPage(p1, p2), assessment: assessment, mock: () => mock(p1), instructors: instructors, join: () => { drawNav('stu'); Quiz.join(app, p1); }, me: me, results: results, host: () => { drawNav(''); Quiz.host(app, p1, auth.token); },
     };
     (map[p0] || (() => { app.innerHTML = '<h1>Page not found</h1><p><a href="#/">Go home</a></p>'; }))();
   }
@@ -276,7 +276,7 @@
         <div class="status">${cw === w.week ? '<span class="chip now-tag">This week</span>' : ''}${st}</div></a>`;
     }).join('');
     app.innerHTML = `<div class="crumbs"><a href="#/">Home</a> / Grade ${g}</div>
-      <div class="lesson-head"><div><h1>Grade ${g}: Term 1 Plan</h1><p class="muted" style="margin:0">${h(G.course)} | Each session: ${h(G.session)}</p></div>
+      <div class="lesson-head"><div><h1>Grade ${g}: Term Plans</h1><p class="muted" style="margin:0">${h(G.course)} | Each session: ${h(G.session)}</p></div>
       <div class="btns"><a class="btn alt" href="#/pool">${icon('Tools')} Project Pool</a></div></div>
       <div class="card" style="margin-bottom:18px"><p class="justify" style="margin-bottom:10px">${h(G.summary)}</p><div class="legend">${legend}</div></div>
       <div class="seg" style="margin-bottom:14px" id="terms"><button class="on" data-t="1">Term 1</button><button data-t="2">Term 2</button><button data-t="3">Term 3</button></div>
@@ -476,7 +476,7 @@
         <div><div class="meta" style="margin:0 0 6px"><span class="chip">${h(P.area)}</span><span class="chip grey">${/to/.test(P.grades) ? 'Grades' : 'Grade'} ${h(P.grades)}</span>${P.sessions ? `<span class="chip grey">${P.sessions} session${P.sessions > 1 ? 's' : ''} (2 periods each)</span>` : ''}<span class="chip ${P.source === 'framework' ? 'm' : 'g'}">${P.source === 'framework' ? 'TCD Framework' : 'TCD team project'}</span></div><h1 style="margin:0">${h(P.name)}</h1></div></div>
       <div class="grid g2" style="align-items:start">
         <div class="grid"><div class="card pad-l"><h3>About the project</h3><p class="justify">${h(P.summary)}</p>${P.outcomes ? `<h3>Learning outcomes</h3><ul class="ticks">${P.outcomes.map((x) => `<li>${h(x)}</li>`).join('')}</ul>` : ''}<p class="small muted" style="margin:10px 0 0">Framework link: ${h(P.framework || '')}${P.term ? ` | Planned for Term ${P.term}` : ''}</p></div>
-          ${X.plan && X.plan.length ? `<div class="card pad-l"><h3>Project plan</h3><ol class="plan-steps">${X.plan.map((x) => `<li>${h(x)}</li>`).join('')}</ol></div>` : ''}
+          ${(D.sessionPlans || {})[id] ? `<div class="card pad-l"><h3>Lesson structure</h3><p class="small muted" style="margin-top:-4px">One session per week. Open a session for the full lesson plan, ready to print or save as PDF.</p><ol class="plan-steps">${D.sessionPlans[id].map((x, i) => `<li><a href="#/plan/${id}/${i + 1}"><b>${h(x.t)}</b></a><br><span class="small muted">${h(x.o)}</span></li>`).join('')}</ol></div>` : X.plan && X.plan.length ? `<div class="card pad-l"><h3>Project plan</h3><ol class="plan-steps">${X.plan.map((x) => `<li>${h(x)}</li>`).join('')}</ol></div>` : ''}
           ${uses.length ? `<div class="card pad-l"><h3>Lessons and timeline</h3>${uses.map((w) => `<a class="wk" href="${w.lessonId ? '#/lesson/' + w.lessonId : '#/week/' + w.grade + '/' + w.week}" style="margin-bottom:10px"><span class="dot" style="background:${pcol(id)}"></span><div class="wnum"><b>${w.week}</b><span>Grade ${w.grade}</span></div><div><h3>${h(w.title)}</h3><p class="small">${h(w.dates)}</p></div><div class="status">${w.lessonId ? `<span class="chip green">${icon('Check')} Full pack</span>` : '<span class="chip grey">Plan</span>'}</div></a>`).join('')}</div>` : ''}
           ${vids.length ? `<div class="card pad-l"><h3>${icon('Youtube')} Videos about this project</h3><div class="vgrid">${vids.map((v) => `<a class="vcard" href="${h(v.url)}" target="_blank" rel="noopener"><span class="vth" style="background-image:url('https://i.ytimg.com/vi/${v.vid}/mqdefault.jpg')"><span class="play">${icon('Play')}</span></span><b>${h(v.title)}</b></a>`).join('')}</div><p class="small muted" style="margin:10px 0 0">Watch each video in full before showing it to students.</p></div>` : ''}</div>
         <div class="grid">${photos.length ? `<div class="card" style="padding:10px"><div class="pphotos">${photos.map((p) => `<img src="${p}" alt="${h(P.name)}" loading="lazy">`).join('')}</div></div>` : ''}
@@ -506,23 +506,57 @@
     draw();
   }
 
+  // ---------- academic calendar ----------
+  const DAY = 864e5;
+  const ymd = (d) => d.toISOString().slice(0, 10);
+  const pd = (s) => new Date(s + 'T00:00:00Z');
+  const fmtD = (d, o) => d.toLocaleDateString('en-GB', Object.assign({ day: 'numeric', month: 'short', timeZone: 'UTC' }, o || {}));
+  function termWeek(t, w) { const a = new Date(pd(D.calendar.terms[t].start).getTime() + (w - 1) * 7 * DAY); const b = new Date(a.getTime() + 4 * DAY); return `${fmtD(a)} to ${fmtD(b)}`; }
+  const CAL_COL = { break: ['#FDE7EC', '#9E1B4B', 'Break'], holiday: ['#FFF1D6', '#9A6200', 'Holiday'], assess: ['#E6ECFA', '#2F4FA8', 'School assessments'], tcd: ['#DDF3EC', '#0B6B4F', 'TCD Skills Assessment'], pd: ['#EEE6F7', '#5B3A8A', 'Staff PD'], start: ['#DFF1F2', '#0A5C5F', 'Term dates'], info: ['#F1F3F4', '#4A5A62', 'Information'] };
+  function calendar() {
+    drawNav('stu'); const C = D.calendar;
+    const byDay = {}; C.events.forEach((e) => { const a = pd(e.start), b = pd(e.end || e.start); for (let d = a; d <= b; d = new Date(d.getTime() + DAY)) (byDay[ymd(d)] = byDay[ymd(d)] || []).push(e); });
+    const termOf = (d) => { for (const t of ['1', '2', '3']) { const T = C.terms[t]; const a = pd(T.start), b = new Date(a.getTime() + (T.weeks * 7 - 3) * DAY); if (d >= a && d <= b) return [t, Math.floor((d - a) / (7 * DAY)) + 1]; } return null; };
+    const pri = ['tcd', 'assess', 'holiday', 'break', 'pd', 'start', 'info'];
+    const month = (y, m) => {
+      const first = new Date(Date.UTC(y, m, 1)); const n = new Date(Date.UTC(y, m + 1, 0)).getUTCDate(); const lead = (first.getUTCDay() + 6) % 7;
+      let cells = '<div class="cal-h">Mon</div><div class="cal-h">Tue</div><div class="cal-h">Wed</div><div class="cal-h">Thu</div><div class="cal-h">Fri</div><div class="cal-h">Sat</div><div class="cal-h">Sun</div>' + '<div></div>'.repeat(lead);
+      for (let i = 1; i <= n; i++) { const d = new Date(Date.UTC(y, m, i)); const ev = (byDay[ymd(d)] || []).slice().sort((a, b) => pri.indexOf(a.type) - pri.indexOf(b.type)); const wk = d.getUTCDay() === 0 || d.getUTCDay() === 6; const c = ev.length ? CAL_COL[ev[0].type] : null; const tw = termOf(d);
+        cells += `<div class="cal-d${wk ? ' we' : ''}" style="${c ? `background:${c[0]};color:${c[1]};font-weight:600` : ''}" title="${h(ev.map((e) => e.label).join(' | ') || (tw && !wk ? 'Term ' + tw[0] + ', Week ' + tw[1] : ''))}">${i}</div>`; }
+      return `<div class="card cal-m"><h3>${first.toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' })}</h3><div class="cal-g">${cells}</div></div>`;
+    };
+    const months = []; for (let k = 0; k < 12; k++) months.push(month(2026 + Math.floor((7 + k) / 12), (7 + k) % 12));
+    const now = new Date(); const tw = termOf(new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())));
+    const list = C.events.filter((e) => e.type !== 'info' || /Ramadan/.test(e.label)).map((e) => { const c = CAL_COL[e.type]; return `<tr><td style="white-space:nowrap">${fmtD(pd(e.start), { weekday: 'short', year: 'numeric' })}${e.end ? ' to ' + fmtD(pd(e.end), { weekday: 'short', year: 'numeric' }) : ''}</td><td><span class="chip" style="background:${c[0]};color:${c[1]}">${c[2]}</span></td><td>${h(e.label)}</td></tr>`; }).join('');
+    app.innerHTML = `<div class="crumbs"><a href="#/">Home</a> / Academic Calendar</div>
+      <div class="lesson-head"><div><h1>${h(C.title)}</h1><p class="muted" style="margin:0">Emirates National Schools | ${tw ? `Today is in <b>Term ${tw[0]}, Week ${tw[1]}</b>` : 'Term dates, breaks and assessments'}</p></div></div>
+      <div class="grid g3" style="margin-bottom:16px">${['1', '2', '3'].map((t) => { const T = C.terms[t]; const a = pd(T.start), b = new Date(a.getTime() + (T.weeks * 7 - 3) * DAY); return `<div class="card"><div class="chip m">Term ${t}</div><h3 style="margin:8px 0 4px">${fmtD(a, { year: 'numeric' })} to ${fmtD(b, { year: 'numeric' })}</h3><p class="small muted" style="margin:0">${T.weeks} weeks | ${T.days} school days</p></div>`; }).join('')}</div>
+      <div class="cal-legend">${Object.values(CAL_COL).filter((c) => c[2] !== 'Information').map((c) => `<span><i style="background:${c[0]};border-color:${c[1]}"></i>${c[2]}</span>`).join('')}</div>
+      <div class="cal-grid">${months.join('')}</div>
+      <h2 style="margin-top:22px">Key dates</h2>
+      <div class="tbl-wrap"><table class="t">${list}</table></div>
+      <p class="small muted" style="margin-top:10px">${h(C.note)} Hover over or tap a date to see what is on that day.</p>`;
+  }
+
   // ---------- custom projects and Term 2/3 plans (kept in Settings) ----------
   let SET = null;
   async function settingsNow(force) { if (SET && !force) return SET; try { SET = (await API.call('settings', {})).settings || {}; } catch (e) { SET = SET || {}; } mergePool(); return SET; }
   function customPool() { try { return JSON.parse((SET || {})['pool:custom'] || '[]'); } catch (e) { return []; } }
   function mergePool() { customPool().forEach((p) => { D.projects[p.id] = Object.assign({ source: 'tcd', pool: 'full', outcomes: [], materials: [], custom: true }, p); }); }
   async function saveSetting(key, value) { await API.call('setSetting', { token: auth.token, key, value }); SET[key] = value; }
-  const TERM_WEEKS = { 2: 12, 3: 12 };
   async function termPlanner(g, t, box) {
     box.innerHTML = '<div class="loading">Loading plan...</div>';
     await settingsNow();
     const key = `plan:t${t}:g${g}`; let plan = {}; try { plan = JSON.parse(SET[key] || '{}'); } catch (e) { }
-    const opts = Object.entries(D.projects).filter(([id, p]) => p.pool !== 'none' && id !== 'term1-showcase').sort((a, b) => a[1].name.localeCompare(b[1].name));
+    const C = D.calendar.terms[t]; const opts = Object.entries(D.projects).filter(([id, p]) => p.pool !== 'none' && id !== 'term1-showcase' && (id !== 'hydroponics-courtyard-farm' || String(g) === '6')).sort((a, b) => a[1].name.localeCompare(b[1].name));
+    const REC = ((D.recommended || {})[t] || {})[g] || {}; if (!Object.keys(plan).length) plan = JSON.parse(JSON.stringify(REC));
     const draw = () => {
-      box.innerHTML = `<div class="card" style="margin-bottom:14px"><p class="justify" style="margin:0">Choose a project for each week of Term ${t}. ${isInst() ? 'Pick from the Project Pool, or add a new project idea from the Project Pool page. Press Save when you finish.' : 'Only instructors can change the plan.'} Lesson packs (slides, lesson plan and worksheet) for the chosen projects are prepared by the TCD team in the standard format.</p></div>
-        <div class="tbl-wrap"><table class="t"><tr><th style="width:90px">Week</th><th>Project</th><th>Note for this week</th></tr>
-        ${Array.from({ length: TERM_WEEKS[t] }, (_, i) => i + 1).map((w) => { const e = plan[w] || {}; return `<tr><td><b>Week ${w}</b></td><td>${isInst() ? `<select class="i" data-w="${w}"><option value="">Not planned yet</option><option value="break" ${e.p === 'break' ? 'selected' : ''}>Break or no lessons</option>${opts.map(([id, p]) => `<option value="${id}" ${e.p === id ? 'selected' : ''}>${h(p.name)}${p.custom ? ' (new idea)' : ''}</option>`).join('')}</select>` : h(e.p === 'break' ? 'Break or no lessons' : (D.projects[e.p] || {}).name || 'Not planned yet')}</td><td>${isInst() ? `<input class="i" data-n="${w}" value="${h(e.n || '')}" maxlength="120" placeholder="Optional, for example Session 2: build the prototype">` : h(e.n || '')}</td></tr>`; }).join('')}</table></div>
-        ${isInst() ? `<div class="btns" style="margin-top:12px"><button class="btn gold" id="sv">${icon('Save')} Save Term ${t} plan</button></div>` : ''}`;
+      const occ = {}; const sess = (w) => { const p = (plan[w] || {}).p; if (!p || !(D.sessionPlans || {})[p]) return ''; let k = 0; for (let x = 1; x <= w; x++) if ((plan[x] || {}).p === p) k++; return k <= D.sessionPlans[p].length ? ` <a class="small" href="#/plan/${p}/${k}${/to/.test(D.projects[p].grades) ? '?g=' + g : ''}">Lesson plan</a>` : ''; };
+      box.innerHTML = `<div class="card" style="margin-bottom:14px"><p class="justify" style="margin:0">Term ${t} runs for ${C.weeks} weeks (${C.days} school days), following the ENS Academic Calendar. ${Object.keys(REC).length ? '<b>The Courtyard Hydroponics Farm is already planned for Grade 6;</b> you can change it. ' : ''}Choose a project for each week of Term ${t}. ${isInst() ? 'Pick from the Project Pool, or add a new project idea from the Project Pool page. Press Save when you finish.' : 'Only instructors can change the plan.'} Lesson packs (slides, lesson plan and worksheet) for the chosen projects are prepared by the TCD team in the standard format.</p></div>
+        <div class="tbl-wrap"><table class="t"><tr><th style="width:150px">Week</th><th>Project</th><th>Note for this week</th></tr>
+        ${Array.from({ length: C.weeks }, (_, i) => i + 1).map((w) => { const e = plan[w] || {}; const wd = termWeek(t, w); if (C.closed[w]) return `<tr style="background:#F4F6F7"><td><b>Week ${w}</b><br><span class="small muted">${wd}</span></td><td colspan="2" class="muted">${h(C.closed[w])}</td></tr>`; return `<tr><td><b>Week ${w}</b><br><span class="small muted">${wd}</span>${C.short[w] ? `<br><span class="small" style="color:#9E1B4B">${h(C.short[w])}</span>` : ''}</td><td>${isInst() ? `<select class="i" data-w="${w}"><option value="">Not planned yet</option><option value="break" ${e.p === 'break' ? 'selected' : ''}>Break or no lessons</option><option value="term1-showcase" ${e.p === 'term1-showcase' ? 'selected' : ''}>Skills Assessment and certificates</option>${opts.map(([id, p]) => `<option value="${id}" ${e.p === id ? 'selected' : ''}>${h(p.name)}${p.custom ? ' (new idea)' : ''}</option>`).join('')}</select>` : h(e.p === 'break' ? 'Break or no lessons' : (D.projects[e.p] || {}).name || 'Not planned yet')}${sess(w)}</td><td>${isInst() ? `<input class="i" data-n="${w}" value="${h(e.n || '')}" maxlength="120" placeholder="Optional, for example Session 2: build the prototype">` : h(e.n || '')}</td></tr>`; }).join('')}</table></div>
+        ${isInst() ? `<div class="btns" style="margin-top:12px"><button class="btn gold" id="sv">${icon('Save')} Save Term ${t} plan</button>${Object.keys(REC).length ? `<button class="btn alt" id="rc">${icon('Redo')} Reset to the starting plan</button>` : ''}</div>` : ''}`;
+      const rc = box.querySelector('#rc'); if (rc) rc.onclick = () => { plan = JSON.parse(JSON.stringify(REC)); draw(); toast('Starting plan filled in. Press Save to keep it.'); };
       const sv = box.querySelector('#sv'); if (sv) sv.onclick = async () => {
         const out = {}; box.querySelectorAll('[data-w]').forEach((el) => { const w = el.dataset.w; const n = box.querySelector(`[data-n="${w}"]`).value.trim(); if (el.value || n) out[w] = { p: el.value, n }; });
         try { await saveSetting(key, JSON.stringify(out)); plan = out; toast(`Term ${t} plan saved`); } catch (e) { toast(e.message); }
@@ -548,6 +582,64 @@
       const list = customPool(); list.push({ id, name: v('pn'), area: v('pa') || 'New project idea', grades: v('pg') || '4 to 6', summary: v('ps'), outcomes: lines('po'), materials: lines('pm'), framework: 'New project idea added by the TCD team' });
       try { await saveSetting('pool:custom', JSON.stringify(list)); mergePool(); m.remove(); toast('Project added to the pool'); done(); } catch (e) { toast(e.message); }
     };
+  }
+
+  // ---------- TCD Framework ----------
+  function framework() {
+    drawNav('hub'); const F = D.framework; const pl = (ids) => ids.map((x) => D.projects[x] ? `<a href="#/project/${x}">${h(D.projects[x].name)}</a>` : h(x)).join(', ');
+    app.innerHTML = `<div class="crumbs"><a href="#/">Home</a> / TCD Framework</div>
+      <div class="lesson-head"><div><h1>${h(F.title)}</h1><p class="muted" style="margin:0">${h(F.version)} | Grades 4 to 9</p></div></div>
+      <div class="card pad-l" style="margin-bottom:16px">${F.intro.map((x) => `<p class="justify">${h(x)}</p>`).join('')}</div>
+      <h2>Learning model: theory to workshop practice</h2>
+      <div class="grid g3" style="margin-bottom:18px">${F.model.map((m) => `<div class="card"><h3 style="margin-top:0">${h(m.stage)}</h3><p class="small justify">${h(m.fn)}</p><p class="small muted justify" style="margin:0">${h(m.app)}</p></div>`).join('')}</div>
+      <h2>Grade plans</h2>
+      <div class="tbl-wrap" style="margin-bottom:18px"><table class="t"><tr><th>Grade</th><th>Course</th><th>Term 1</th><th>Term 2</th><th>Term 3</th></tr>
+      ${F.grades.map((g) => `<tr><td><b>${h(g.g)}</b></td><td><b>${h(g.title)}</b><br><span class="small muted">${h(g.idea)}</span></td>${g.terms.map((t, i) => `<td>${h(t)}<br><span class="small">${pl([g.projects[i]])}</span></td>`).join('')}</tr>`).join('')}</table></div>
+      <h2>Assessment architecture</h2>
+      <div class="tbl-wrap" style="margin-bottom:18px"><table class="t"><tr><th>Domain</th><th>Weight</th><th>What teachers look for</th><th>Typical evidence</th></tr>${F.assessment.map((a) => `<tr><td><b>${h(a.domain)}</b></td><td>${a.weight}%</td><td>${h(a.look)}</td><td>${h(a.evidence)}</td></tr>`).join('')}</table></div>
+      <h2>Safety levels</h2>
+      <div class="tbl-wrap" style="margin-bottom:18px"><table class="t"><tr><th>Level</th><th>Student access</th><th>Typical tools</th><th>Evidence required</th></tr>${F.safety.map((a) => `<tr><td><b>${h(a.level)}</b></td><td>${h(a.access)}</td><td>${h(a.tools)}</td><td>${h(a.evidence)}</td></tr>`).join('')}</table></div>
+      <h2>Workshop areas and equipment</h2>
+      <div class="tbl-wrap" style="margin-bottom:18px"><table class="t"><tr><th>Equipment or zone</th><th>Use in the curriculum</th><th>Grades</th><th>Safety and supervision</th></tr>${F.zones.map((a) => `<tr><td><b>${h(a.zone)}</b></td><td>${h(a.use)}</td><td>${h(a.grades)}</td><td>${h(a.control)}</td></tr>`).join('')}</table></div>
+      <h2>Curriculum links</h2>
+      <div class="tbl-wrap" style="margin-bottom:18px"><table class="t"><tr><th>Area</th><th>Theory</th><th>TCD hands-on evidence</th></tr>${F.links.map((a) => `<tr><td><b>${h(a.area)}</b></td><td>${h(a.theory)}</td><td>${h(a.evidence)}</td></tr>`).join('')}</table></div>
+      <h2>Portfolio evidence by grade band</h2>
+      <div class="tbl-wrap" style="margin-bottom:18px"><table class="t"><tr><th>Evidence</th><th>Grades 4 to 5</th><th>Grades 6 to 7</th><th>Grades 8 to 9</th></tr>${F.evidence.map((a) => `<tr><td><b>${h(a.item)}</b></td><td>${h(a.g45)}</td><td>${h(a.g67)}</td><td>${h(a.g89)}</td></tr>`).join('')}</table></div>
+      <h2>Launch project sequence</h2>
+      <div class="tbl-wrap"><table class="t"><tr><th>Phase</th><th>Timing</th><th>Focus</th><th>Projects</th><th>Success evidence</th></tr>${F.launch.map((a) => `<tr><td><b>${h(a.phase)}</b></td><td>${h(a.weeks)}</td><td>${h(a.focus)}</td><td>${pl(a.projects)}</td><td>${h(a.evidence)}</td></tr>`).join('')}</table></div>`;
+  }
+
+  // ---------- printable lesson plan for a session ----------
+  function planPage(pid, n) {
+    drawNav('pool');
+    const P = D.projects[pid], S = ((D.sessionPlans || {})[pid] || [])[+n - 1];
+    if (!P || !S) { app.innerHTML = '<p>Lesson plan not found.</p>'; return; }
+    const total = D.sessionPlans[pid].length;
+    const gs = (String(P.grades).match(/\d+/g) || ['4']).map(Number); const grs = gs.length === 2 && /to/.test(P.grades) ? Array.from({ length: gs[1] - gs[0] + 1 }, (_, i) => String(gs[0] + i)) : gs.map(String);
+    const sel = new URLSearchParams(location.hash.split('?')[1] || '').get('g'); const g = grs.includes(sel) ? sel : grs[0];
+    const mins = g === '6' ? 120 : 90; const M = g === '6' ? [15, 20, 20, 50, 15] : [10, 15, 15, 40, 10];
+    const objL = g === '6' ? 'Objective' : 'WALT (We Are Learning To)', scL = g === '6' ? 'Success criteria' : 'WILF (What I Am Looking For)';
+    const tr = (k, v) => `<tr><th style="width:26%">${k}</th><td>${v}</td></tr>`;
+    app.innerHTML = `<div class="crumbs noprint"><a href="#/project/${pid}">${h(P.name)}</a> / Session ${n} lesson plan</div>
+      <div class="btns noprint" style="margin-bottom:12px">${grs.length > 1 ? `<select class="i" id="pg" style="width:auto">${grs.map((x) => `<option ${x === g ? 'selected' : ''}>${x}</option>`).join('')}</select>` : ''}<button class="btn gold" onclick="window.print()">${icon('Print')} Print or save as PDF</button>${+n > 1 ? `<a class="btn alt" href="#/plan/${pid}/${+n - 1}${grs.length > 1 ? '?g=' + g : ''}">${icon('ChevronLeft')} Session ${+n - 1}</a>` : ''}${+n < total ? `<a class="btn alt" href="#/plan/${pid}/${+n + 1}${grs.length > 1 ? '?g=' + g : ''}">Session ${+n + 1} ${icon('ChevronRight')}</a>` : ''}</div>
+      <div class="card pad-l lp">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--teal);padding-bottom:8px;margin-bottom:12px"><img src="assets/img/tcd-logo-print.png" style="height:42px" alt=""><img src="assets/img/tcc-logo.png" style="height:42px" alt=""></div>
+        <h1 style="margin:0 0 2px">Lesson Plan: ${h(S.t)}</h1><p class="muted" style="margin:0 0 12px">${h(P.name)} | Session ${n} of ${total}</p>
+        <table class="t lpt">${tr('Teacher name', 'Ms. Lubna Kakkengal and Mr. Dilan Devendra')}${tr('Class and subject', `Grade ${g} | Technology and Career Development (TCD)`)}${tr('Duration', `${mins} minutes`)}${tr('Framework link', h(P.framework || ''))}
+        ${tr(objL, h(S.o))}${tr(scL, `<ul>${S.sc.map((x) => `<li>${h(x)}</li>`).join('')}</ul>`)}${tr('Key vocabulary', h((S.v || []).join(', ')))}${tr('Resources', h((P.materials || []).join(', ')))}${S.s ? tr('Safety focus', h(S.s)) : ''}</table>
+        <h2>Lesson structure</h2>
+        <table class="t lpt"><tr><th style="width:18%">Stage</th><th style="width:10%">Time</th><th>Activities</th></tr>
+          <tr><td><b>Starter</b></td><td>${M[0]} min</td><td>Workshop routine and safety reminder. Recap of the last session and the hook question. Share the ${g === '6' ? 'objective and success criteria' : 'WALT and WILF'}.</td></tr>
+          <tr><td><b>I do</b></td><td>${M[1]} min</td><td>${h(S.i)}</td></tr>
+          <tr><td><b>We do</b></td><td>${M[2]} min</td><td>${h(S.w)}</td></tr>
+          <tr><td><b>You do</b></td><td>${M[3]} min</td><td>${h(S.y)}</td></tr>
+          <tr><td><b>Closure</b></td><td>${M[4]} min</td><td>Students share one result and one improvement. Exit ticket or quick quiz. Clean-down checklist and tools returned.</td></tr></table>
+        <h2>Differentiated learning groups</h2>
+        <table class="t lpt"><tr><th>Desert Fox</th><th>Camel</th><th>Oryx</th><th>Falcon</th></tr><tr>
+          <td>Extend the task, explain the theory link in their own words and support a partner.</td><td>Complete the task independently and record the evidence.</td><td>Complete the task with a partner check and a teacher check-in halfway.</td><td>Teacher or partner beside them, picture prompts and key words taught first.</td></tr></table>
+        <table class="t lpt" style="margin-top:12px">${tr('Assessment evidence', h(S.ev))}${tr('TCD Framework domains', 'Design Process 25% | Technical Skills and Safety 25% | Prototype or Product Quality 20% | Theory-to-Practice Connection 15% | Communication and Reflection 15%')}${tr('Inclusive planning', 'EAL: word wall with pictures and sentence frames. SEN: step cards and extra time. G&amp;T: extension challenge and peer support.')}</table>
+      </div>`;
+    const pg = app.querySelector('#pg'); if (pg) pg.onchange = () => (location.hash = `#/plan/${pid}/${n}?g=${pg.value}`);
   }
 
   // ---------- Term 1 Skills Assessment ----------

@@ -468,3 +468,19 @@ footer.site2 .copy { border-top: 1px solid rgba(255,255,255,.12); margin-top: 32
 /* Term assessment */
 .ans.picked{outline:4px solid #0A5C5F;outline-offset:2px}
 label.chk{display:inline-flex;gap:8px;align-items:center;margin:4px 0;cursor:pointer}
+/* printable lesson plan */
+.lp h2{font-size:1.1rem;margin:16px 0 6px;color:var(--teal-d)}
+.lpt th{background:var(--teal-ll);text-align:left;vertical-align:top}
+.lpt td,.lpt th{vertical-align:top;text-align:justify}
+.lpt ul{margin:0;padding-left:18px}
+@media print { .noprint, .crumbs { display:none !important; } .lp { box-shadow:none !important; border:0 !important; padding:0 !important; } .lpt td,.lpt th{font-size:10.5pt} main, .wrap { padding:0 !important; } }
+/* academic calendar */
+.cal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.cal-m{padding:14px}
+.cal-m h3{margin:0 0 8px;font-size:1rem}
+.cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+.cal-h{font-size:.7rem;color:var(--ink-3,#6b7a84);font-weight:600}
+.cal-d{font-size:.8rem;padding:5px 0;border-radius:6px;cursor:default}
+.cal-d.we{color:#B0BAC0}
+.cal-legend{display:flex;flex-wrap:wrap;gap:14px;margin:0 0 12px;font-size:.85rem}
+.cal-legend i{display:inline-block;width:14px;height:14px;border-radius:4px;border:1px solid;margin-right:6px;vertical-align:-2px}
