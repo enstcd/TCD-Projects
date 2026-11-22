@@ -124,12 +124,12 @@
   // ---------- TCD Initiatives (everyone) ----------
   const INI = 'assets/initiatives/';
   const COMPS = [
-    ['Dubai · January 2027', 'FIRST LEGO League UAE', 'Explore (ages 6 to 10) and Challenge (ages 9 to 16). Dubai rounds on 9 January and 16 to 17 January 2027. Builds on our robotics and coding projects.', 'https://www.flluae.org/'],
-    ['Abu Dhabi · Ages 13 and under', 'Yas in Schools, Ethara Go', 'A STEM and motorsport competition run by Ethara with ADNOC, with national finals at Yas Marina Circuit. Links to our design and engineering projects.', ''],
-    ['Online · Entries open 13 January 2027', 'Coolest Projects Online Showcase', 'A global online showcase by the Raspberry Pi Foundation for young creators up to 18 who make projects with code. A good fit for Flowlab games and Photon coding.', 'https://online.coolestprojects.org/take-part'],
-    ['UAE · Ages 8 to 12', 'World Robot Olympiad, Elementary', 'The robotics category for ages 8 to 12, and a pathway for a future TCD robotics team.', ''],
-    ['UAE · Ages 7 to 12', 'Nature Champions, Emirates Nature-WWF', 'An award scheme for primary students with learning, simulations and outdoor adventures. Links to the Photon eco mission and the hydroponics farm.', 'https://emiratesnaturewwf.ae/en/page/nature-champions'],
-    ['Dubai · All grades', 'DEWA Conservation Award', 'Run by DEWA with KHDA for Dubai schools that save energy and water, with a student team category. Links to our sustainability projects.', ''],
+    ['Dubai and UAE · January to February 2027', 'FIRST LEGO League UAE', 'The UAE Robotics Championship for school teams: Explore (ages 6 to 10) and Challenge (ages 9 to 16). Dubai rounds on 9 January and 16 to 17 January 2027, then the UAE final. Builds on our robotics and coding projects.', 'https://www.flluae.org/'],
+    ['UAE · Ages 13 and under', 'Yas in Schools, Ethara Go', 'A national STEM and motorsport competition for UAE schools, run by Ethara, with finals at Yas Marina Circuit. Links to our design and engineering projects.', ''],
+    ['UAE · KG to Grade 12 · Final in Dubai, 20 March 2027', 'STEAM Champions UAE 2026/2027', 'A national student competition in AI, robotics, drones and circular design, with a robotics lane for Grades 3 to 6. Online qualification by 20 February 2027. Registration closed on 31 October 2026, so late entry must be checked with the organiser.', 'https://edustream.ae/steam-champions-uae-2026-2027/'],
+    ['UAE · Grades 3 to 8 · Free', 'Code Battle (UAE inter-school hackathon)', 'A free coding hackathon for teams of 2 or 3 students from UAE schools: Captain division for Grades 3 to 5 and Colonel for Grades 6 to 8, using block coding. The 2026 season has finished; watch for the 2027 season.', 'https://codebattle.tech/'],
+    ['UAE · Ages 8 to 12', 'World Robot Olympiad UAE, Elementary', 'The UAE national qualifier of the World Robot Olympiad for school teams of up to three students with a coach. A pathway for a future TCD robotics team.', ''],
+    ['UAE · Ages 7 to 12', 'Nature Champions, Emirates Nature-WWF', 'A UAE award scheme for primary students with learning, simulations and outdoor adventures. Links to the Photon eco mission and the hydroponics farm.', 'https://emiratesnaturewwf.ae/en/page/nature-champions'],
   ];
   const iniTeaser = () => `<section class="hsec"><div class="st"><div><div class="kick">TCD Initiatives</div><h2>Beyond the classroom</h2></div><a class="btn sm" href="#/initiatives">All initiatives</a></div>
     <div class="grid g3">${[['flag-board-progress.jpg', 'Signature for UAE Flag', 'A whole-school community flag of thumbprints, from Flag Day to UAE National Day.', 'center 30%'], ['workshop-candles.jpg', 'Workshops for teachers and parents', 'Candle and soap making, with 3D design, Cool Tools and laser cutting coming next.', 'center 55%'], ['garden-concept.jpg', 'Coming soon: garden and hydroponics', 'A TCD school garden and a Grade 6 hydroponics farm built by students.', 'center']].map(([img, t, d, pos]) => `<a class="inic" href="#/initiatives"><img src="${INI}${img}" alt="${h(t)}" loading="lazy" style="object-position:${pos}"><div><b>${h(t)}</b><p>${h(d)}</p></div></a>`).join('')}</div></section>`;
@@ -160,7 +160,7 @@
       <figure class="ini-hero"><img src="${INI}garden-concept.jpg" alt="TCD School Garden design concept" loading="lazy"></figure>
 
       <div class="section-title"><h2>Competition opportunities 2026–2027</h2></div>
-      <p class="muted" style="margin-top:-6px">Identified by TCD to match our Grade 4 to 6 projects. Dates and rules are confirmed with each organiser before registering.</p>
+      <p class="muted" style="margin-top:-6px">UAE competitions open to students from UAE schools, chosen to match our Grade 4 to 6 projects. Dates and rules are confirmed with each organiser before registering.</p>
       <div class="grid comps">${COMPS.map(([where, name, d, url], i) => `<div class="card comp"><span class="chip ${i % 2 ? 'm' : ''}">${h(where)}</span><h3>${h(name)}</h3><p class="muted small">${h(d)}</p>${url ? `<a class="small" href="${url}" target="_blank" rel="noopener">Official page ${icon('ArrowRight')}</a>` : ''}</div>`).join('')}</div>`;
     app.insertAdjacentHTML('beforeend', logoBand());
   }
