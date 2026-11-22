@@ -94,23 +94,26 @@
     'safety-induction': ['Workshop safety', 'Following instructions', 'Careful making'],
     'junior-innovator': ['Creative ideas', 'Sketching and planning', '3D design basics', '3D printing'],
     'junior-engineer': ['Innovation and creative ideas', 'Sketching and planning', 'Prototyping', '3D design and 3D printing'],
-    'junior-designer': ['3D design', '3D printing', 'Branding', 'Logo design'],
-    'shadow-candle-holder': ['2D digital design', 'Laser cutting', 'Cutting and sanding with Cool Tools', 'Measuring and finishing'],
+    'junior-designer': ['3D modelling in Tinkercad', 'Accurate measurement', '3D printing'],
+    'shadow-candle-holder': ['Design from a UAE theme', 'Measuring and marking out', 'Cutting and sanding with Cool Tools', 'Assembly and finishing'],
     'flowlab-game-studio': ['2D game development', 'Block coding', 'Designing game levels'],
-    'candle-making': ['Safe use of hot materials', 'Following a process', 'Product branding'],
+    'candle-making': ['Following a step-by-step process', 'Hot wax safety', 'Science of melting and cooling'],
     'soap-making': ['Following a process', 'Costing and pricing', 'Product branding'],
     'photon-eco-mission': ['Coding a robot', 'Algorithms and flowcharts', 'Sustainability campaign'],
     'photon-ai-mission': ['Sensors and algorithms', 'Loops and conditions', 'Debugging'],
-    'matatalab-pro': ['Coding sequences', 'Loops and functions', 'Angles and shapes'],
+    'matatalab-pro': ['Sequencing commands', 'Debugging code'],
+    'kubo-coding': ['Building code with TagTiles', 'Route planning', 'Record and play functions'],
+    'campus-tag': ['Marking out with a stencil', 'Sanding and drilling safely', 'Finishing a product'],
     'hydroponics-courtyard-farm': ['Smart farming', 'Woodwork', '3D design and printing', 'Data recording'],
     'laser-metal-studio': ['3D design', 'Laser cutting', 'Metal stamping'],
   };
   // Term 1 certificate: every project the grade did, with the skills from each.
   const TERM_PROJECTS = {
-    4: [['TCD Safety Induction and Origami', 'Workshop safety, following instructions, origami folding'], ['Junior Innovator Challenge', 'Creative ideas, sketching and planning, 3D design basics in Tinkercad, 3D printing a custom keychain'], ['Candle Making', 'Planning a product, safe pouring, brand and logo design'], ['Matatalab Pro Coding', 'Coding sequences, loops, functions, angles and drawing shapes']],
-    5: [['TCD Safety Induction and Origami', 'Workshop safety, following instructions, origami folding'], ['Photon Environmental Mission', 'Research and design brief, route planning, robot coding, campaign design'], ['Candle Making', 'Safe use of hot wax, measuring temperature, product branding'], ['Junior Designer Challenge', '3D design and 3D printing, business planning, logo design in Canva, badge making']],
-    6: [['TCD Safety Induction and Origami', 'Workshop safety, following instructions, origami folding'], ['Junior Engineer Challenge', 'Innovation and creative ideas, sketching and planning, prototyping, 3D design and 3D printing'], ['Candle Making', 'Safe use of hot wax, measuring temperature, product branding'], ['UAE-Themed Shadow Candle Holder', 'Sketching, 2D digital design, laser cutting, cutting and sanding with Cool Tools'], ['Flowlab Game Studio', '2D game development, block coding, designing game levels'], ['Photon AI Mission', 'Sensors and algorithms, loops and conditions, debugging']],
+    4: [['TCD Safety Induction and Origami', 'Workshop safety, following instructions, origami folding'], ['Junior Innovator Challenge', 'Creative ideas and presenting, sketching and planning, teamwork, 3D design basics in Tinkercad'], ['Candle Making', 'Following a step-by-step process, hot wax safety, science of melting and cooling'], ['Matatalab Pro Coding', 'Sequencing commands, debugging code'], ['KUBO Coding Robot', 'Building code with TagTiles, route planning, record and play functions']],
+    5: [['TCD Safety Induction and Origami', 'Workshop safety, following instructions, origami folding'], ['Photon Environmental Mission', 'Robot sensors, algorithms and flowcharts, research and design brief, environmental campaign design'], ['Candle Making', 'Following a step-by-step process, hot wax safety, science of melting and cooling'], ['Junior Designer Challenge', '3D modelling in Tinkercad, accurate measurement, 3D printing'], ['Craft Your Campus Tag', 'Marking out with a stencil, sanding and drilling safely, finishing a product']],
+    6: [['TCD Safety Induction and Origami', 'Workshop safety, following instructions, origami folding'], ['Junior Engineer Challenge', 'Idea pitching, team roles and collaboration, prototyping and testing, 3D design and 3D printing'], ['Candle Making', 'Following a step-by-step process, hot wax safety, science of melting and cooling'], ['UAE-Themed Shadow Candle Holder', 'Design from a UAE theme, measuring and marking out, cutting and sanding with Cool Tools, assembly and finishing']],
   };
+
   // Projects for the year-end certificate, by term. Terms 2 and 3 follow the TCD Project Briefing and can be added to on the website.
   const YEAR_PROJECTS = {
     4: { 1: TERM_PROJECTS[4], 2: [['Soap Product and Brand Identity', 'Following a process, measuring ingredients, product branding and packaging'], ['VinciBot Coding Challenge', 'Block coding, robot movement and sensors, problem solving'], ['Jewellery Making with Beads and Copper Wire', 'Pattern design, wire shaping, careful hand skills']], 3: [] },
