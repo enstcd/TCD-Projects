@@ -263,16 +263,16 @@
     const ex = c.rank && c.rank <= 3;
     const items = c.breakdown || [];
     const cols = items.length > 4 ? 3 : 2;
-    const grid = `<div style="display:grid;grid-template-columns:repeat(${cols},1fr);column-gap:26px;row-gap:9px;text-align:left">${items.map((p, i) => `<div style="display:flex;gap:10px;align-items:flex-start">${badge(i + 1)}<div style="flex:1"><div style="display:flex;justify-content:space-between;gap:8px;font:600 13.5px Outfit,Arial;color:${GR.dark}"><span>${e(p.name)}</span><span style="color:${GR.mid}">${p.percent}%</span></div><div style="font-size:11.5px;line-height:1.35;color:${GR.grey};margin-top:2px">${p.skills.map(e).join(', ')}</div></div></div>`).join('')}</div>`;
+    const grid = `<div style="display:grid;grid-template-columns:repeat(${cols},1fr);column-gap:26px;row-gap:9px;text-align:left">${items.map((p, i) => `<div style="display:flex;gap:10px;align-items:flex-start">${badge(i + 1)}<div style="flex:1"><div style="display:flex;justify-content:space-between;gap:8px;font:600 13.5px Outfit,Arial;color:${GR.dark}"><span>${e(p.name)}</span>${p.percent == null ? '' : `<span style="color:${GR.mid}">${p.percent}%</span>`}</div><div style="font-size:11.5px;line-height:1.35;color:${GR.grey};margin-top:2px">${p.skills.map(e).join(', ')}</div></div></div>`).join('')}</div>`;
     return `<div style="position:absolute;left:0;right:0;top:168px;text-align:center">
-        ${label(ex ? 'Certificate of Excellence' : 'Term 1 Skills Certificate')}
+        ${label(c.title || (ex ? 'Certificate of Excellence' : 'Term 1 Skills Certificate'))}
         <div style="font-size:15px;color:${GR.grey};margin-top:12px">This certificate is proudly presented to</div>
         <div style="font:700 44px Outfit,Arial;line-height:58px;height:58px;padding-bottom:10px;color:${GR.dark};margin-top:2px">${e(c.firstName)} ${e(c.lastName)}</div>
         <div style="width:420px;height:1px;background:${GR.soft};margin:12px auto 8px"></div>
         <div style="font-size:16px;color:${GR.text}">${ex ? `for achieving <b>${PLACE[c.rank - 1]} place</b> in the Term 1 Skills Assessment of the Technology and Career Center programme` : 'for completing the <b>Term 1 Skills Assessment</b> of the Technology and Career Center programme'}</div>
-        <div style="font-size:14px;color:${GR.grey};margin-top:2px">${classLabel(c)} &nbsp;|&nbsp; Overall score <b style="color:${GR.dark}">${c.percent}%</b> (${level(c.percent)}) &nbsp;|&nbsp; Academic Year 2026-2027</div>
+        <div style="font-size:14px;color:${GR.grey};margin-top:2px">${classLabel(c)}${c.percent == null ? '' : ` &nbsp;|&nbsp; Overall score <b style="color:${GR.dark}">${c.percent}%</b> (${level(c.percent)})`} &nbsp;|&nbsp; Academic Year 2026-2027</div>
         <div style="margin:12px auto 0;width:930px;border-top:1px solid ${GR.faint};padding-top:9px">
-          <div style="font:600 10.5px Outfit,Arial;letter-spacing:.28em;color:${GR.muted};margin-bottom:8px">SCORE AND SKILLS BY PROJECT</div>
+          <div style="font:600 10.5px Outfit,Arial;letter-spacing:.28em;color:${GR.muted};margin-bottom:8px">${items.some((p) => p.percent != null) ? 'SCORE AND SKILLS BY PROJECT' : 'PROJECTS COMPLETED AND SKILLS ACHIEVED'}</div>
           ${grid}
         </div>
       </div>`;

@@ -132,29 +132,23 @@
     // Term assessment: each student works at their own pace, each question has its own timer, no answer is shown until the end.
     function playAssess() {
       const L = st.lesson, Q = L.quiz; let qi = 0, correct = 0; const answers = []; const t0 = Date.now();
+      // No timer: students read at their own pace, pick an answer, then press Next. Total time is still recorded for ranking ties.
       function show() {
-        const q = Q[qi], LIMIT = q.t || 15; let left = LIMIT, done = false; const qStart = Date.now();
+        const q = Q[qi]; let pick = -1, done = false; const qStart = Date.now();
         el.innerHTML = `<div class="game"><div class="gcard">
-          <div class="qtop"><span class="chip">Question ${qi + 1} of ${Q.length}</span><span class="chip m">${h(L.title)}</span>
-          <div class="timer"><svg width="60" height="60"><circle cx="30" cy="30" r="26" stroke="#e6f2f2" stroke-width="6" fill="none"/><circle id="ring" cx="30" cy="30" r="26" stroke="#0E7C80" stroke-width="6" fill="none" stroke-dasharray="163.4" stroke-dashoffset="0" stroke-linecap="round"/></svg><b id="tl">${LIMIT}</b></div></div>
+          <div class="qtop"><span class="chip">Question ${qi + 1} of ${Q.length}</span><span class="chip m">${h(L.title)}</span></div>
           <div class="progress" style="height:6px;background:#e6f2f2;border-radius:3px;margin:4px 0 14px"><div style="height:6px;border-radius:3px;background:#0E7C80;width:${Math.round(qi * 100 / Q.length)}%"></div></div>
           <div class="qtext">${h(q.q)}</div>
-          <div class="answers">${q.o.map((o, i) => `<button class="ans a${i}" data-i="${i}"><span class="shape">${icon(SHAPES[i])}</span><span>${h(o)}</span></button>`).join('')}</div></div></div>`;
-        const ring = el.querySelector('#ring'), tl = el.querySelector('#tl');
-        const tick = every(() => {
-          left = Math.max(0, LIMIT - (Date.now() - qStart) / 1000);
-          tl.textContent = Math.ceil(left); ring.setAttribute('stroke-dashoffset', String(163.4 * (1 - left / LIMIT)));
-          if (left <= 5) ring.setAttribute('stroke', '#9E1B4B');
-          if (left <= 0 && !done) answer(-1);
-        }, 100);
-        function answer(i) {
-          if (done) return; done = true; clearInterval(tick);
-          const ok = i === q.a; if (ok) correct++;
-          answers.push({ q: qi, a: i, ok: ok ? 1 : 0, s: Math.round((Date.now() - qStart) / 100) / 10 });
-          el.querySelectorAll('.ans').forEach((b) => { b.disabled = true; if (+b.dataset.i === i) b.classList.add('picked'); else b.classList.add('dim'); });
-          later(() => { qi++; qi < Q.length ? show() : finish(); }, 450);
-        }
-        el.querySelectorAll('.ans').forEach((b) => (b.onclick = () => answer(+b.dataset.i)));
+          <div class="answers">${q.o.map((o, i) => `<button class="ans a${i}" data-i="${i}"><span class="shape">${icon(SHAPES[i])}</span><span>${h(o)}</span></button>`).join('')}</div>
+          <div class="btns" style="justify-content:flex-end;margin-top:14px"><button class="btn gold" id="nx" disabled>${qi + 1 < Q.length ? 'Next question' : 'Finish and submit'} ${icon('ArrowRight')}</button></div></div></div>`;
+        const nx = el.querySelector('#nx');
+        el.querySelectorAll('.ans').forEach((b) => (b.onclick = () => { if (done) return; pick = +b.dataset.i; el.querySelectorAll('.ans').forEach((x) => x.classList.toggle('picked', x === b)); nx.disabled = false; }));
+        nx.onclick = () => {
+          if (done || pick < 0) return; done = true;
+          const ok = pick === q.a; if (ok) correct++;
+          answers.push({ q: qi, a: pick, ok: ok ? 1 : 0, s: Math.round((Date.now() - qStart) / 100) / 10 });
+          qi++; qi < Q.length ? show() : finish();
+        };
       }
       async function finish() {
         clearTimers();

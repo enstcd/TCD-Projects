@@ -650,7 +650,7 @@
       <div class="btns"><a class="btn alt" href="#/mock/${g}">${icon('Play')} Mock test (10 questions)</a>${isInst() ? `<button class="btn gold" data-g="${g}">${icon('Bolt')} Start the real assessment</button>` : ''}</div></div>`; };
     app.innerHTML = `<div class="crumbs"><a href="#/">Home</a> / Term 1 Skills Assessment</div>
       <div class="lesson-head"><div><h1>Term 1 Skills Assessment</h1><p class="muted" style="margin:0">Week 13 | ${h(D.weeks[13])}</p></div>${isInst() ? `<div class="btns"><a class="btn alt" href="#/results">${icon('Certificate')} Results and certificates</a></div>` : ''}</div>
-      <div class="card" style="margin-bottom:18px"><p class="justify" style="margin:0"><b>How it works.</b> First, run the mock test on the board with the whole class: open it, read each question, let the class answer, then show the right answer. Then start the real assessment. Students join with the code or QR code, type their first name, last name, grade and section, and answer the questions on their own device. Each question has its own timer (10 seconds for easy questions, 15 to 20 seconds for harder ones). Every student has one attempt. Students are ranked by score, and when scores are equal the faster student ranks higher. Every student gets a Term 1 certificate with a score for each project, and the top 3 in each class get a Certificate of Excellence.</p></div>
+      <div class="card" style="margin-bottom:18px"><p class="justify" style="margin:0"><b>How it works.</b> First, run the mock test on the board with the whole class: open it, read each question, let the class answer, then show the right answer. Then start the real assessment. Students join with the code or QR code, type their first name, last name, grade and section, and answer the questions on their own device. There is no timer, so students can read every question and answer carefully, then press Next. Every student has one attempt. Students are ranked by score, and when scores are equal the student who finished first ranks higher. Every student gets a Term 1 certificate with a score for each project, and the top 3 in each class get a Certificate of Excellence.</p></div>
       <div class="grid g3">${['4', '5', '6'].map(card).join('')}</div>`;
     app.querySelectorAll('[data-g]').forEach((b) => (b.onclick = () => { const L = D.lessons['g' + b.dataset.g + '-t1a']; startQuiz(Object.assign({}, L, { title: L.title + ', Grade ' + L.grade })); }));
   }
@@ -662,22 +662,20 @@
     const show = () => {
       Quiz.clearTimers();
       if (qi >= Q.length) {
-        app.innerHTML = `<div class="game"><div class="gcard center"><div class="chip m">Mock test | Grade ${h(g)}</div><h1 style="margin:14px 0 6px">Mock test finished</h1><p class="muted">The class got ${right} of ${Q.length} right.</p><p>The real assessment has ${L.quiz.length} questions, with the same kind of questions and timers.</p><div class="btns" style="justify-content:center"><button class="btn alt" id="again">${icon('Redo')} Play again</button><a class="btn" href="#/assessment">${icon('ChevronLeft')} Back to the assessment page</a></div></div></div>`;
+        app.innerHTML = `<div class="game"><div class="gcard center"><div class="chip m">Mock test | Grade ${h(g)}</div><h1 style="margin:14px 0 6px">Mock test finished</h1><p class="muted">The class got ${right} of ${Q.length} right.</p><p>The real assessment has ${L.quiz.length} questions of the same kind, with no timer.</p><div class="btns" style="justify-content:center"><button class="btn alt" id="again">${icon('Redo')} Play again</button><a class="btn" href="#/assessment">${icon('ChevronLeft')} Back to the assessment page</a></div></div></div>`;
         app.querySelector('#again').onclick = () => { qi = 0; right = 0; show(); }; return;
       }
       const q = Q[qi], LIMIT = q.t || 15, t0 = Date.now(); let done = false;
       app.innerHTML = `<div class="crumbs"><a href="#/assessment">Term 1 Skills Assessment</a> / Grade ${h(g)} mock test</div><div class="game"><div class="gcard">
         <div class="qtop"><span class="chip">Question ${qi + 1} of ${Q.length}</span><span class="chip m">${h(pname(q.p))}</span>
-        <div class="timer"><svg width="60" height="60"><circle cx="30" cy="30" r="26" stroke="#e6f2f2" stroke-width="6" fill="none"/><circle id="ring" cx="30" cy="30" r="26" stroke="#0E7C80" stroke-width="6" fill="none" stroke-dasharray="163.4" stroke-dashoffset="0" stroke-linecap="round"/></svg><b id="tl">${LIMIT}</b></div></div>
+</div>
         <div class="qtext">${h(q.q)}</div>
         <div class="answers">${q.o.map((o, i) => `<button class="ans a${i}" data-i="${i}"><span class="shape">${icon(SH[i])}</span><span>${h(o)}</span></button>`).join('')}</div>
         <div id="fb"></div><div class="btns" style="justify-content:space-between;margin-top:12px"><button class="btn alt" id="rv">${icon('Eye')} Show the answer</button><button class="btn" id="nx" style="display:none">Next ${icon('ArrowRight')}</button></div></div></div>`;
-      const ring = app.querySelector('#ring'), tl = app.querySelector('#tl');
-      const tick = setInterval(() => { if (!document.body.contains(ring)) return clearInterval(tick); const left = Math.max(0, LIMIT - (Date.now() - t0) / 1000); tl.textContent = Math.ceil(left); ring.setAttribute('stroke-dashoffset', String(163.4 * (1 - left / LIMIT))); if (left <= 5) ring.setAttribute('stroke', '#9E1B4B'); if (left <= 0 && !done) reveal(-1); }, 100);
       function reveal(i) {
-        if (done) return; done = true; clearInterval(tick); const ok = i === q.a; if (ok) right++;
+        if (done) return; done = true; const ok = i === q.a; if (ok) right++;
         app.querySelectorAll('.ans').forEach((b) => { const bi = +b.dataset.i; b.disabled = true; if (bi === q.a) b.classList.add('right'); else if (bi === i) b.classList.add('wrong'); else b.classList.add('dim'); });
-        app.querySelector('#fb').innerHTML = `<div class="feedback ${ok ? 'y' : 'n'}">${icon(ok ? 'Check' : 'Times')}<div><b>${ok ? 'Correct!' : i < 0 ? "Time's up! The right answer is shown in green." : 'Not quite. The right answer is shown in green.'}</b><br>${h(q.e)}</div></div>`;
+        app.querySelector('#fb').innerHTML = `<div class="feedback ${ok ? 'y' : 'n'}">${icon(ok ? 'Check' : 'Times')}<div><b>${ok ? 'Correct!' : i < 0 ? 'The right answer is shown in green.' : 'Not quite. The right answer is shown in green.'}</b><br>${h(q.e)}</div></div>`;
         app.querySelector('#rv').style.display = 'none'; app.querySelector('#nx').style.display = '';
       }
       app.querySelectorAll('.ans').forEach((b) => (b.onclick = () => reveal(+b.dataset.i)));
@@ -929,7 +927,7 @@
         v.querySelectorAll('[data-r]').forEach((b) => (b.onclick = async () => { const a = list[+b.dataset.r]; if (!confirm(`Allow ${a.firstName} ${a.lastName} a second try at this quiz?`)) return; await API.call('approveRetake', { token: auth.token, studentId: a.studentId, lessonId: a.lessonId }); toast('Second try approved'); results(); }));
       }
       if (tab === 'assess') {
-        const AG = store.get('tcd_ag') || { grade: F.grade || '6', section: F.section || '', p1: true, p23: false, roleOnly: false, mode: '' };
+        const AG = Object.assign({ grade: F.grade || '6', section: F.section || '', p1: true, p23: false, d1: false, d23: false, roleOnly: false, mode: '' }, store.get('tcd_ag') || {});
         const L = D.lessons['g' + AG.grade + '-t1a'];
         const all = R.attempts.filter((a) => a.lessonId === L.id && (!AG.section || a.section === AG.section));
         const best = {}; all.forEach((a) => { const k = a.studentId; if (!best[k] || +a.correct > +best[k].correct || (+a.correct === +best[k].correct && +a.timeTakenSec < +best[k].timeTakenSec)) best[k] = a; });
@@ -947,8 +945,9 @@
             <select class="i" id="as"><option value="">All sections</option>${secs.map((x) => `<option ${x === AG.section ? 'selected' : ''}>${h(x)}</option>`).join('')}</select></div>
           <p class="small muted" style="margin:10px 0 0">Ranking is inside each class: higher score first, and the faster student first when scores are equal. Every student gets a Term 1 Skills Certificate with a score for each project. The top 3 in each class get a Certificate of Excellence. All certificates are signed by Ms. Lubna Kakkengal and Mr. Dilan Devendra.</p></div>
           <div class="card" style="margin-bottom:14px"><h3 style="margin-top:0">Signatures on the Certificates of Excellence</h3>
-            <label class="chk"><input type="checkbox" id="p1" ${AG.p1 ? 'checked' : ''}> 1st place: also signed by the ENS Dubai, Acting Campus Principal</label><br>
-            <label class="chk"><input type="checkbox" id="p23" ${AG.p23 ? 'checked' : ''}> 2nd and 3rd place: also signed by the ENS Dubai, Acting Campus Principal</label><br>
+            <p class="small muted" style="margin:0 0 6px">Ms. Lubna Kakkengal and Mr. Dilan Devendra sign every certificate. Tick who else signs the Certificates of Excellence; leave all unticked for instructors only.</p>
+            <b class="small">1st place:</b> <label class="chk"><input type="checkbox" id="p1" ${AG.p1 ? 'checked' : ''}> ENS Dubai, Acting Campus Principal</label> <label class="chk"><input type="checkbox" id="d1" ${AG.d1 ? 'checked' : ''}> TCC Director</label><br>
+            <b class="small">2nd and 3rd place:</b> <label class="chk"><input type="checkbox" id="p23" ${AG.p23 ? 'checked' : ''}> ENS Dubai, Acting Campus Principal</label> <label class="chk"><input type="checkbox" id="d23" ${AG.d23 ? 'checked' : ''}> TCC Director</label><br>
             <label class="chk"><input type="checkbox" id="ro" ${AG.roleOnly ? 'checked' : ''}> Print the principal's role only, without a name</label>
             <div class="seg" style="margin-top:10px" id="md"><button data-m="digital" class="${mode === 'digital' ? 'on' : ''}" ${hasSig ? '' : 'disabled title="Upload signatures in the Certificates tab first"'}>Digital signatures</button><button data-m="print" class="${mode === 'print' ? 'on' : ''}">Blank lines to sign by hand</button></div></div>
           <div class="btns" style="margin-bottom:12px"><button class="btn gold" id="allc" ${rows.length ? '' : 'disabled'}>${icon('Download')} All certificates (PDF)</button><button class="btn" id="exc" ${rows.some((a) => a.rank <= 3) ? '' : 'disabled'}>${icon('Award')} Certificates of Excellence only</button><button class="btn alt" id="axl" ${rows.length ? '' : 'disabled'}>${icon('FileExcel')} Excel results</button><span class="small muted" id="prog"></span></div>
@@ -960,14 +959,49 @@
         $('#p1').onchange = (e) => { AG.p1 = e.target.checked; store.set('tcd_ag', AG); };
         $('#p23').onchange = (e) => { AG.p23 = e.target.checked; store.set('tcd_ag', AG); };
         $('#ro').onchange = (e) => { AG.roleOnly = e.target.checked; store.set('tcd_ag', AG); };
+        $('#d1').onchange = (e) => { AG.d1 = e.target.checked; store.set('tcd_ag', AG); };
+        $('#d23').onchange = (e) => { AG.d23 = e.target.checked; store.set('tcd_ag', AG); };
         v.querySelectorAll('#md button').forEach((b) => (b.onclick = () => { AG.mode = b.dataset.m; save(); }));
-        const optsFor = (c) => { const pr = c.rank === 1 ? AG.p1 : c.rank <= 3 ? AG.p23 : false; return Object.assign({}, base, { mode, roleOnly: AG.roleOnly, signers: pr ? ['lubna', 'dilan', 'principal'] : ['lubna', 'dilan'] }); };
+        const optsFor = (c) => { const pr = c.rank === 1 ? AG.p1 : c.rank <= 3 ? AG.p23 : false; const dr = c.rank === 1 ? AG.d1 : c.rank <= 3 ? AG.d23 : false; const sg = ['lubna', 'dilan']; if (dr) sg.push('director'); if (pr) sg.push('principal'); return Object.assign({}, base, { mode, roleOnly: AG.roleOnly, signers: sg }); };
         const certData = (a) => ({ firstName: a.firstName, lastName: a.lastName, grade: a.grade, section: a.section, rank: a.rank, percent: a.percent, breakdown: a.breakdown, certId: 'TCD-T1-' + String(a.attemptId || '').toUpperCase(), date: new Date().toISOString() });
         const run = async (list, name) => { const pg = $('#prog'); try { await Docs.assessCertificates(list.map(certData), optsFor, name, (d, n) => (pg.textContent = `Making certificate ${d} of ${n}...`)); } finally { pg.textContent = ''; } };
         const tag = `Grade${AG.grade}${AG.section ? '_' + AG.section : ''}`;
         $('#allc').onclick = () => run(rows, `TCD_Term1_Certificates_${tag}.pdf`);
         $('#exc').onclick = () => run(rows.filter((a) => a.rank <= 3), `TCD_Term1_Excellence_${tag}.pdf`);
         v.querySelectorAll('[data-ac]').forEach((b) => (b.onclick = () => { const a = rows[+b.dataset.ac]; run([a], `TCD_Term1_Certificate_${a.firstName}_${a.lastName}.pdf`.replace(/\s+/g, '_')); }));
+        // ---- make a certificate by hand: grade, skills, student names, signers ----
+        const MC = Object.assign({ grade: AG.grade, type: 'skills', place: '1', section: '', names: '', picks: {}, sg: { lubna: true, dilan: true, principal: false, director: false } }, store.get('tcd_mc') || {});
+        const ML = D.lessons['g' + MC.grade + '-t1a'];
+        v.insertAdjacentHTML('beforeend', `<div class="card" style="margin-top:18px"><h3 style="margin-top:0">${icon('Certificate')} Make a certificate by hand</h3>
+          <p class="small muted" style="margin-top:-4px">For a student who missed the assessment, a special award, or a replacement. Choose the grade and certificate, tick the projects and skills, type the names (one per line) and choose who signs.</p>
+          <div class="filters" style="margin:0 0 10px"><select class="i" id="mg">${['4', '5', '6'].map((g) => `<option value="${g}" ${g === MC.grade ? 'selected' : ''}>Grade ${g}</option>`).join('')}</select>
+            <input class="i" id="msec" placeholder="Section, for example 6BA" value="${h(MC.section)}" style="max-width:220px">
+            <select class="i" id="mt"><option value="skills" ${MC.type === 'skills' ? 'selected' : ''}>Term 1 Skills Certificate</option><option value="ex" ${MC.type === 'ex' ? 'selected' : ''}>Certificate of Excellence</option></select>
+            <select class="i" id="mp" style="${MC.type === 'ex' ? '' : 'display:none'}">${['1', '2', '3'].map((x) => `<option value="${x}" ${x === MC.place ? 'selected' : ''}>${['1st', '2nd', '3rd'][x - 1]} place</option>`).join('')}</select></div>
+          <div class="grid g2" style="margin-bottom:10px">${ML.projects.map((P) => `<div class="card" style="padding:10px 12px"><label class="chk"><input type="checkbox" data-mp="${P.id}" ${(MC.picks[P.id] || []).length ? 'checked' : ''}> <b>${h(P.name)}</b></label><br>${P.skills.map((k) => `<label class="chk small" style="margin-left:22px"><input type="checkbox" data-ms="${P.id}" value="${h(k)}" ${(MC.picks[P.id] || []).includes(k) ? 'checked' : ''}> ${h(k)}</label>`).join('<br>')}</div>`).join('')}</div>
+          <label class="f">Student names (first and last name, one per line)</label><textarea class="i" id="mn" rows="4" placeholder="Aisha Khan">${h(MC.names)}</textarea>
+          <div style="margin:10px 0"><b class="small">Signed by:</b> ${[['lubna', 'Ms. Lubna Kakkengal'], ['dilan', 'Mr. Dilan Devendra'], ['director', 'TCC Director'], ['principal', 'ENS Dubai, Acting Campus Principal']].map(([k, n]) => `<label class="chk"><input type="checkbox" data-sg="${k}" ${MC.sg[k] ? 'checked' : ''}> ${n}</label>`).join(' ')}</div>
+          <div class="btns"><button class="btn gold" id="mgo">${icon('Download')} Make the certificates (PDF)</button><span class="small muted" id="mprog"></span></div></div>`);
+        const msave = () => { MC.names = $('#mn').value; MC.section = $('#msec').value.trim(); MC.picks = {}; v.querySelectorAll('[data-ms]:checked').forEach((x) => (MC.picks[x.dataset.ms] = MC.picks[x.dataset.ms] || []).push(x.value)); v.querySelectorAll('[data-sg]').forEach((x) => (MC.sg[x.dataset.sg] = x.checked)); store.set('tcd_mc', MC); };
+        $('#mg').onchange = (e) => { msave(); MC.grade = e.target.value; MC.picks = {}; store.set('tcd_mc', MC); draw(); };
+        $('#mt').onchange = (e) => { MC.type = e.target.value; $('#mp').style.display = MC.type === 'ex' ? '' : 'none'; msave(); };
+        $('#mp').onchange = (e) => { MC.place = e.target.value; msave(); };
+        v.querySelectorAll('[data-mp]').forEach((x) => (x.onchange = () => { v.querySelectorAll(`[data-ms="${x.dataset.mp}"]`).forEach((k) => (k.checked = x.checked)); msave(); }));
+        v.querySelectorAll('[data-ms],[data-sg]').forEach((x) => (x.onchange = msave));
+        $('#mn').oninput = msave; $('#msec').oninput = msave;
+        $('#mgo').onclick = async () => {
+          msave();
+          const names = MC.names.split('\n').map((x) => x.trim()).filter(Boolean);
+          const items = ML.projects.filter((P) => (MC.picks[P.id] || []).length).map((P) => ({ name: P.name, skills: MC.picks[P.id], percent: null }));
+          const sg = ['lubna', 'dilan', 'director', 'principal'].filter((k) => MC.sg[k]);
+          if (!names.length) return toast('Type at least one student name.');
+          if (!items.length) return toast('Tick at least one project skill.');
+          if (!sg.length) return toast('Choose at least one signature.');
+          const sec = MC.section.toUpperCase();
+          const list = names.map((n) => { const parts = n.split(/\s+/); return { firstName: parts[0], lastName: parts.slice(1).join(' '), grade: MC.grade, section: sec, rank: MC.type === 'ex' ? +MC.place : 0, percent: null, breakdown: items, certId: 'TCD-T1-M' + Date.now().toString(36).toUpperCase().slice(-6), date: new Date().toISOString() }; });
+          const o = Object.assign({}, certOptions({ grade: MC.grade, section: sec }, R.settings), { mode, roleOnly: AG.roleOnly, signers: sg });
+          const pg = $('#mprog'); try { await Docs.assessCertificates(list, () => o, `TCD_Term1_Certificates_Grade${MC.grade}_custom.pdf`, (d, n) => (pg.textContent = `Making certificate ${d} of ${n}...`)); } finally { pg.textContent = ''; }
+        };
         $('#axl').onclick = () => { const data = rows.map((a) => { const o = { Place: a.rank, 'First name': a.firstName, 'Last name': a.lastName, Grade: a.grade, Section: a.section, Marks: `${a.correct}/${a.total}`, 'Score %': a.percent, Time: Docs.fmtTime(a.timeTakenSec) }; a.breakdown.forEach((p) => (o[p.name + ' %'] = p.percent)); return o; }); const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Term 1 Assessment'); XLSX.writeFile(wb, `TCD_Term1_Assessment_${tag}.xlsx`); };
       }
       if (tab === 'certs') {
